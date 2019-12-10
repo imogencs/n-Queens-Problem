@@ -13,8 +13,9 @@ using namespace std;
 
 
 int main() {
+
 	int n = 8;
-	int board[8] = {1, 0, -1, -1, -1, -1, -1, -1};
+	int board[8] = {1, 3, 0, 2, 4, 7, 5, -1};
 
 	cout << "start board:" << endl;
 	printBoard(board, n);
@@ -73,7 +74,7 @@ int backtrack (int* board, int n, int row) {
 		for (int i = row; i < n; i++) {
 			board[i] = -1;
 		}
-		backtrack(board, n, row-1);
+		return backtrack(board, n, row-1);
 	}
 
 	// find legal solution for the current row
@@ -82,7 +83,6 @@ int backtrack (int* board, int n, int row) {
 		cout << "trying new board in backtrack:" << endl;
 		printBoard(board, n);
 		if (isLegalPosition(board, n)) {
-			nextLegalPosition(board, n);
 			return 1;
 		}
 	}
@@ -95,13 +95,14 @@ int backtrack (int* board, int n, int row) {
 		board[i] = -1;
 	}
 
-	backtrack(board, n, row-1);
-	return 1;
+	return backtrack(board, n, row-1);
 }
 
 
 
 /*
+ * TODO
+ *
  * case 1: full legal solution
  * 	backtrack until a legal board is found
  *
@@ -130,10 +131,7 @@ int nextLegalPosition(int* board, int n) {
 
 	// case 1: full, legal solution
 	if (isLegalPosition(board, n) && row == n-1) {
-		cout << "found legal full boardd" << endl;
-		return 1; // TODO should we return board here or an empty new board
-	}
-	else if (row == n-1) {
+		cout << "found legal full board" << endl;
 		return backtrack(board, n, row);
 	}
 
@@ -141,6 +139,7 @@ int nextLegalPosition(int* board, int n) {
 	else if (isLegalPosition(board, n)) {
 		cout << "partial legal solution for row: " << row << endl;
 
+		// try to add a queen to the next empty row
 		for (int col = 0; col < n; col++) {
 			board[row+1] = col;
 			if (isLegalPosition(board, n)) {
@@ -148,6 +147,8 @@ int nextLegalPosition(int* board, int n) {
 				return 1;
 			}
 		}
+
+		// if it wasn't possible, backtrack
 		board[row+1] = -1;
 		printBoard(board, n);
 		cout << "calling backtrack for row: " << row << endl;
@@ -160,7 +161,11 @@ int nextLegalPosition(int* board, int n) {
 		if (board[row] < n-1) {
 			board[row]++;
 			printBoard(board, n);
-			return nextLegalPosition(board, n);
+			if (isLegalPosition(board, n)) {
+				return 1;
+			}
+			else
+				return nextLegalPosition(board, n);
 		}
 		else {
 			return backtrack(board, n, row);
