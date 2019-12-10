@@ -8,14 +8,13 @@
 
 #include <iostream>
 
-
 using namespace std;
 
 int backtrack (int* board, int n, int row);
 int nextLegalPosition(int* board, int n);
 void printBoard(int* board, int n);
 int isFull (int* board, int n);
-int findCompleteBoard (int* board, int n);
+int findCompleteBoards ();
 
 int main() {
 
@@ -28,7 +27,7 @@ int main() {
 
 //	nextLegalPosition(boardA, n);
 
-	findCompleteBoard(boardB, n);
+	findCompleteBoards();
 	return 0;
 }
 
@@ -74,8 +73,8 @@ int isLegalPosition (int* board, int n) {
 
 int backtrack (int* board, int n, int row) {
 
-	cout << "in backtrack for row: " << row << endl;
-	printBoard(board, n);
+	//cout << "in backtrack for row: " << row << endl;
+	//printBoard(board, n);
 
 	// the current row is in the last column - backtrack previous row
 	if (board[row] == n - 1) {
@@ -88,15 +87,15 @@ int backtrack (int* board, int n, int row) {
 	// find legal solution for the current row
 	for (int col = board[row]+1; col < n; col++) {
 		board[row] = col;
-		cout << "trying new board in backtrack:" << endl;
-		printBoard(board, n);
+		//cout << "trying new board in backtrack:" << endl;
+		//printBoard(board, n);
 		if (isLegalPosition(board, n)) {
 			return 1;
 		}
 	}
 
-	cout << "after backtrack:" << endl;
-	printBoard(board, n);
+	//cout << "after backtrack:" << endl;
+	//printBoard(board, n);
 
 	// reset the rest of the board after the current row
 	for (int i = row; i < n; i++) {
@@ -110,12 +109,19 @@ int backtrack (int* board, int n, int row) {
 
 
 
-int findCompleteBoard (int* board, int n) {
-	cout << "here1" << endl;
-	while (!isFull(board, n)) {
-		cout << "here2" << endl;
-		nextLegalPosition(board, n);
-		printBoard(board, n);
+int findCompleteBoards () {
+	int* board;
+	for (int boardSize = 4; boardSize < 101; boardSize++) {
+		board = new int[boardSize];
+		for (int i = 0; i < boardSize; i++) {
+			board[i] = -1;
+		}
+		while (!isFull(board, boardSize)) {
+			nextLegalPosition(board, boardSize);
+			
+		}
+		cout << "First complete board for n = " << boardSize << endl;
+		printBoard(board, boardSize);
 	}
 }
 
@@ -150,36 +156,36 @@ int nextLegalPosition(int* board, int n) {
 
 	// case 1: full, legal solution
 	if (isLegalPosition(board, n) && row == n-1) {
-		cout << "found legal full board" << endl;
+		//cout << "found legal full board" << endl;
 		return backtrack(board, n, row);
 	}
 
 	// case 2: partial legal solution
 	else if (isLegalPosition(board, n)) {
-		cout << "partial legal solution for row: " << row << endl;
+		//cout << "partial legal solution for row: " << row << endl;
 
 		// try to add a queen to the next empty row
 		for (int col = 0; col < n; col++) {
 			board[row+1] = col;
 			if (isLegalPosition(board, n)) {
-				printBoard(board, n);
+				//printBoard(board, n);
 				return 1;
 			}
 		}
 
 		// if it wasn't possible, backtrack
 		board[row+1] = -1;
-		printBoard(board, n);
-		cout << "calling backtrack for row: " << row << endl;
+		//printBoard(board, n);
+		//cout << "calling backtrack for row: " << row << endl;
 		return backtrack(board, n, row);
 	}
 
 	// case 3: partial illegal solution
 	else {
-		cout << "partial illegal solution" << endl;
+		//cout << "partial illegal solution" << endl;
 		if (board[row] < n-1) {
 			board[row]++;
-			printBoard(board, n);
+			//printBoard(board, n);
 			if (isLegalPosition(board, n)) {
 				return 1;
 			}
