@@ -11,16 +11,20 @@
 
 using namespace std;
 
-
 int main() {
 
 	int n = 8;
-	int board[8] = {1, 3, 0, 2, 4, 7, 5, -1};
+	int numSols = 0;
 
-	cout << "start board:" << endl;
-	printBoard(board, n);
 
-	nextLegalPosition(board, n);
+//	findCompleteBoards();
+
+	cout << "Enter in a number 4 <= n <= 20: ";
+	cin >> n;
+
+	numSols = findAllSolutions(n);
+	cout << "total number of solutions: " << numSols << endl;
+
 	return 0;
 }
 
@@ -61,18 +65,21 @@ int isLegalPosition (int* board, int n) {
 
 
 /*
- *
+ * Returns 1 if a legal solution was found, 0 otherwise.
  */
 
 int backtrack (int* board, int n, int row) {
 
-	cout << "in backtrack for row: " << row << endl;
-	printBoard(board, n);
+	//cout << "in backtrack for row: " << row << endl;
+	//printBoard(board, n);
 
 	// the current row is in the last column - backtrack previous row
 	if (board[row] == n - 1) {
 		for (int i = row; i < n; i++) {
 			board[i] = -1;
+		}
+		if (row == 0) {
+			return 0;
 		}
 		return backtrack(board, n, row-1);
 	}
@@ -80,15 +87,15 @@ int backtrack (int* board, int n, int row) {
 	// find legal solution for the current row
 	for (int col = board[row]+1; col < n; col++) {
 		board[row] = col;
-		cout << "trying new board in backtrack:" << endl;
-		printBoard(board, n);
+		//cout << "trying new board in backtrack:" << endl;
+		//printBoard(board, n);
 		if (isLegalPosition(board, n)) {
 			return 1;
 		}
 	}
 
-	cout << "after backtrack:" << endl;
-	printBoard(board, n);
+	//cout << "after backtrack:" << endl;
+	//printBoard(board, n);
 
 	// reset the rest of the board after the current row
 	for (int i = row; i < n; i++) {
@@ -97,23 +104,6 @@ int backtrack (int* board, int n, int row) {
 
 	return backtrack(board, n, row-1);
 }
-
-
-
-/*
- * TODO
- *
- * case 1: full legal solution
- * 	backtrack until a legal board is found
- *
- * case 2: partial legal solution
- * 	add queen to next empty row
- * 	if not possible, backtrack until a legal board is found
- *
- * case 3: partial illegal solution
- * 	change queen in the last full row
- * 	if not possible, backtrack until a legal board is found
- */
 
 
 
@@ -131,41 +121,39 @@ int nextLegalPosition(int* board, int n) {
 
 	// case 1: full, legal solution
 	if (isLegalPosition(board, n) && row == n-1) {
-		cout << "found legal full board" << endl;
+		//cout << "found legal full board" << endl;
 		return backtrack(board, n, row);
+
 	}
 
 	// case 2: partial legal solution
 	else if (isLegalPosition(board, n)) {
-		cout << "partial legal solution for row: " << row << endl;
 
 		// try to add a queen to the next empty row
 		for (int col = 0; col < n; col++) {
 			board[row+1] = col;
 			if (isLegalPosition(board, n)) {
-				printBoard(board, n);
 				return 1;
 			}
 		}
 
 		// if it wasn't possible, backtrack
 		board[row+1] = -1;
-		printBoard(board, n);
-		cout << "calling backtrack for row: " << row << endl;
 		return backtrack(board, n, row);
 	}
 
 	// case 3: partial illegal solution
 	else {
-		cout << "partial illegal solution" << endl;
+		//cout << "partial illegal solution" << endl;
 		if (board[row] < n-1) {
 			board[row]++;
-			printBoard(board, n);
+			//printBoard(board, n);
 			if (isLegalPosition(board, n)) {
 				return 1;
 			}
-			else
+			else {
 				return nextLegalPosition(board, n);
+			}
 		}
 		else {
 			return backtrack(board, n, row);
@@ -173,6 +161,68 @@ int nextLegalPosition(int* board, int n) {
 	}
 	return 0;
 }
+
+
+
+
+
+void findCompleteBoards () {
+	int* board;
+
+	for (int boardSize = 4; boardSize <= 100; boardSize++) {
+		board = new int[boardSize];
+		for (int i = 0; i < boardSize; i++) {
+			board[i] = -1;
+		}
+		while (!isFull(board, boardSize)) {
+			nextLegalPosition(board, boardSize);
+		}
+		cout << "First complete board for n = " << boardSize << endl;
+		printBoard(board, boardSize);
+	}
+}
+
+
+/*
+ * Finds all solutions to then-Queens Problem for a particular n and
+ * prints them out in lexicographical order.
+ */
+int findAllSolutions(int n) {
+	int allSolutionsFound = 0;
+	int numSolutions = 0;
+	int* board = new int[n];
+
+	for (int i = 0; i < n; i++) {
+		board[i] = -1;
+	}
+
+	while (!allSolutionsFound) {
+		while (!allSolutionsFound && !isFull(board, n)) {
+			allSolutionsFound =	!nextLegalPosition(board, n);
+		}
+
+		if (!allSolutionsFound) {
+			numSolutions++;
+			printBoard(board, n);
+			allSolutionsFound = !nextLegalPosition(board, n);
+		}
+	}
+	return numSolutions;
+}
+
+
+
+
+int isFull (int* board, int n) {
+	int boardIsFull = 1;
+	for (int i = 0; i < n; i++) {
+		if (board[i] == -1) {
+			boardIsFull = 0;
+		}
+	}
+	return boardIsFull;
+}
+
 
 /*
  * In the given board, for each row, the function prints out the column
@@ -187,3 +237,7 @@ void printBoard(int* board, int n) {
 	}
 	cout << ")" << endl;
 }
+
+
+
+
