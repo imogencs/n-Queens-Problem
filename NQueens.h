@@ -2,7 +2,7 @@
 // Name        : NQueens.h
 // Author      : Imogen Cleaver-Stigum & Jyalu Wu
 // Version     :
-// Copyright   : 2019 IMOLU
+// Copyright   : ©2019 IMOLU
 // Description :
 //============================================================================
 
