@@ -17,7 +17,7 @@ int main() {
 	int numSols = 0;
 
 
-//	findCompleteBoards();
+	findCompleteBoards();
 
 	cout << "Enter in a number 4 <= n <= 20: ";
 	cin >> n;
@@ -47,17 +47,27 @@ int isLegalPosition (int* board, int n) {
 				isLegal = 0;
 			}
 		}
-		if (row < n-1) { // check for same-diagonal queens on negative-slope diagonals
-			if (board[row] == board[row+1]-1 && board[row]!= -1 && board[row+1] != -1) {
-				isLegal = 0;
+
+
+		// check for positive slope diagonal queens
+		for (int i = 0; i < row; i++) {
+				if (i + board[i] == row + board[row] && board[row] != -1 && board[i] != -1) {
+					return 0;
 			}
 		}
-		if (row > 0) { // check for same-diagonal queens on positive-slope diagonals
-			if (board[row] == board[row-1]-1 && board[row]!= -1 && board[row-1] != -1) {
-				isLegal = 0;
+
+
+
+		// check for negative slope diagonal queens
+		for (int i = 0; i < row; i++) {
+			if (i - board[i] == row - board[row] && board[row] != -1 && board[i] != -1) {
+					return 0;
 			}
 		}
+
+
 	}
+
 	return isLegal;
 }
 
@@ -169,7 +179,7 @@ int nextLegalPosition(int* board, int n) {
 void findCompleteBoards () {
 	int* board;
 
-	for (int boardSize = 4; boardSize <= 100; boardSize++) {
+	for (int boardSize = 4; boardSize <= 30; boardSize++) {
 		board = new int[boardSize];
 		for (int i = 0; i < boardSize; i++) {
 			board[i] = -1;
@@ -201,7 +211,7 @@ int findAllSolutions(int n) {
 			allSolutionsFound =	!nextLegalPosition(board, n);
 		}
 
-		if (!allSolutionsFound) {
+		if (isLegalPosition(board, n) && !allSolutionsFound) {
 			numSolutions++;
 			printBoard(board, n);
 			allSolutionsFound = !nextLegalPosition(board, n);
